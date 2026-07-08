@@ -1,0 +1,123 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 60px;
+  background: #1e293b;
+}
+
+.navbar a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+.hero {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+}
+
+.hero button {
+  padding: 12px 25px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+form {
+  width: 400px;
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+}
+
+form button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background: #38bdf8;
+  border: none;
+  color: white;
+  border-radius: 8px;
+}
+.dashboard {
+  padding: 40px;
+}
+
+.dashboard h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.quiz-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.quiz-card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  transition: 0.3s;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.quiz-card:hover {
+  transform: translateY(-8px);
+}
+
+.quiz-card h2 {
+  margin-bottom: 15px;
+}
+
+.quiz-card p {
+  margin: 10px 0;
+}
+
+.quiz-card button {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border: none;
+  background: #38bdf8;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
