@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 
 function Home() {
@@ -6,12 +7,9 @@ function Home() {
   return (
     <div className="hero">
       <h1>Quiz Master</h1>
+      <p>Practice Aptitude, JavaScript, React, and MERN quizzes.</p>
 
-      <p>Test Your Skills and Knowledge</p>
-
-      <button
-        onClick={() => navigate("/dashboard")}
-      >
+      <button onClick={() => navigate("/dashboard")}>
         Explore Quizzes
       </button>
     </div>

@@ -1,5 +1,5 @@
 import QuizCard from "../components/QuizCard";
-import quizzes from "../data/quizzes";
+import quizzes from "../data/questions";
 
 function Dashboard() {
   return (
