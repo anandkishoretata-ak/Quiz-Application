@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Quiz from "./pages/Quiz";
 import Result from "./pages/Result";
 import Leaderboard from "./pages/Leaderboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
@@ -20,7 +21,14 @@ function App() {
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/result" element={<Result />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );
