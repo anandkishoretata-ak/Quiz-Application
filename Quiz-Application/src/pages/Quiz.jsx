@@ -53,6 +53,10 @@ function Quiz() {
       "score",
       score
     );
+    localStorage.setItem(
+  "total",
+  questions.length
+);
 
     navigate("/result");
   };

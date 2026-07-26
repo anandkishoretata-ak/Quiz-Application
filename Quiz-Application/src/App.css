@@ -209,3 +209,106 @@ form button {
 .stat-card h2 {
   color: #38bdf8;
 }
+.result-card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 500px;
+  margin: auto;
+}
+
+.result-card button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #38bdf8;
+  color: white;
+  cursor: pointer;
+}
+.profile-page,
+.leaderboard-page {
+  padding: 40px;
+}
+
+.profile-card {
+  max-width: 400px;
+  margin: auto;
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border: 1px solid #334155;
+  padding: 12px;
+  text-align: center;
+}
+
+table th {
+  background: #1e293b;
+}
+body.dark {
+  background: #0f172a;
+  color: white;
+}
+
+body.light {
+  background: white;
+  color: black;
+}
+
+body.light .quiz-card,
+body.light .navbar,
+body.light .welcome-card,
+body.light .stat-card,
+body.light .result-card {
+  background: #f1f5f9;
+  color: black;
+}
+.quiz-card {
+  transition: all 0.3s ease;
+}
+
+.quiz-card:hover {
+  box-shadow:
+    0 10px 25px
+    rgba(56,189,248,0.4);
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: #1e293b;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

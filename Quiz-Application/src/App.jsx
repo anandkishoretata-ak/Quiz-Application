@@ -8,6 +8,7 @@ import Quiz from "./pages/Quiz";
 import Result from "./pages/Result";
 import Leaderboard from "./pages/Leaderboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./pages/Profile";
 
 
 function App() {
@@ -21,6 +22,9 @@ function App() {
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/result" element={<Result />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/profile"  element={<Profile />}  />
+
+
         <Route
   path="/dashboard"
   element={
