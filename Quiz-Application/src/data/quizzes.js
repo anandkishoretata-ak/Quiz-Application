@@ -1,31 +1,31 @@
 const quizzes = [
   {
-    id: 1,
-    title: "JavaScript Quiz",
+    id: "java",
+    title: "Java Quiz",
     category: "Programming",
     questions: 10,
     time: "10 Min",
   },
   {
-    id: 2,
+    id: "react",
     title: "React Quiz",
     category: "Frontend",
-    questions: 15,
-    time: "15 Min",
+    questions: 10,
+    time: "10 Min",
   },
   {
-    id: 3,
+    id: "mern",
     title: "MERN Quiz",
     category: "Full Stack",
-    questions: 20,
-    time: "20 Min",
+    questions: 10,
+    time: "10 Min",
   },
   {
-    id: 4,
+    id: "aptitude",
     title: "Aptitude Quiz",
     category: "Placement",
-    questions: 25,
-    time: "25 Min",
+    questions: 10,
+    time: "10 Min",
   },
 ];
 
