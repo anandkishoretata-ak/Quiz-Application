@@ -1,4 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -7,32 +11,85 @@ import Dashboard from "./pages/Dashboard";
 import Quiz from "./pages/Quiz";
 import Result from "./pages/Result";
 import Leaderboard from "./pages/Leaderboard";
-import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/quiz" element={<Quiz />} />
-        <Route path="/result" element={<Result />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/profile"  element={<Profile />}  />
-
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
         <Route
-  path="/dashboard"
-  element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-/>
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/quiz/:category"
+          element={
+            <ProtectedRoute>
+              <Quiz />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/result"
+          element={
+            <ProtectedRoute>
+              <Result />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 Page */}
+        <Route
+          path="*"
+          element={
+            <h1>
+              404 - Page Not Found
+            </h1>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
