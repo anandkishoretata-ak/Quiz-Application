@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import {
+  useNavigate,
+  Link,
+} from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,10 +16,9 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const user =
-      JSON.parse(
-        localStorage.getItem("user")
-      );
+    const user = JSON.parse(
+      localStorage.getItem("user")
+    );
 
     if (
       user?.email === email &&
@@ -44,26 +45,41 @@ function Login() {
         <input
           type="email"
           placeholder="Email"
+          value={email}
           onChange={(e) =>
             setEmail(
               e.target.value
             )
           }
+          required
         />
 
         <input
           type="password"
           placeholder="Password"
+          value={password}
           onChange={(e) =>
             setPassword(
               e.target.value
             )
           }
+          required
         />
 
         <button type="submit">
           Login
         </button>
+
+        <p
+          style={{
+            marginTop: "15px",
+          }}
+        >
+          Don't have an account?{" "}
+          <Link to="/register">
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
