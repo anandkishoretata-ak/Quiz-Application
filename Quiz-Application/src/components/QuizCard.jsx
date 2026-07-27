@@ -26,11 +26,11 @@ function QuizCard({ quiz }) {
         Duration: {quiz.time}
       </p>
 
-      <Link to="/quiz">
-        <button>
-          Start Quiz
-        </button>
-      </Link>
+     <Link to={`/quiz/${quiz.id}`}>
+      <button>
+    Start Quiz
+      </button>
+   </Link>
     </motion.div>
   );
 }
