@@ -1,16 +1,35 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function Home() {
-  const navigate = useNavigate();
-
   return (
     <div className="hero">
-      <h1>Quiz Master</h1>
-      <p>Practice Aptitude, JavaScript, React, and MERN quizzes.</p>
+      <motion.h1
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        Welcome to <span>Quiz Master</span>
+      </motion.h1>
 
-      <button onClick={() => navigate("/dashboard")}>
-        Explore Quizzes
-      </button>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        Improve your skills with Java, React, MERN and Aptitude quizzes.
+        Track your progress and compete on the leaderboard.
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
+        <Link to="/login">
+          <button>Get Started</button>
+        </Link>
+      </motion.div>
     </div>
   );
 }
