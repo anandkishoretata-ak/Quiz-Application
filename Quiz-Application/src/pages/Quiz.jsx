@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useNavigate,
   useParams,
 } from "react-router-dom";
 
 import Question from "../components/Question";
+import ProgressBar from "../components/ProgressBar";
 
 import javaQuestions from "../data/javaQuestions";
 import reactQuestions from "../data/reactQuestions";
@@ -44,30 +45,14 @@ function Quiz() {
   const [answers, setAnswers] =
     useState({});
 
+  const [timeLeft, setTimeLeft] =
+    useState(60);
+
   const handleAnswer = (option) => {
     setAnswers({
       ...answers,
       [currentQuestion]: option,
     });
-  };
-
-  const nextQuestion = () => {
-    if (
-      currentQuestion <
-      questions.length - 1
-    ) {
-      setCurrentQuestion(
-        currentQuestion + 1
-      );
-    }
-  };
-
-  const previousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(
-        currentQuestion - 1
-      );
-    }
   };
 
   const submitQuiz = () => {
@@ -97,6 +82,41 @@ function Quiz() {
     navigate("/result");
   };
 
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      submitQuiz();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(
+        (prev) => prev - 1
+      );
+    }, 1000);
+
+    return () =>
+      clearInterval(timer);
+  }, [timeLeft]);
+
+  const nextQuestion = () => {
+    if (
+      currentQuestion <
+      questions.length - 1
+    ) {
+      setCurrentQuestion(
+        currentQuestion + 1
+      );
+    }
+  };
+
+  const previousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(
+        currentQuestion - 1
+      );
+    }
+  };
+
   if (questions.length === 0) {
     return (
       <div className="quiz-page">
@@ -113,6 +133,17 @@ function Quiz() {
       <h2>
         {category.toUpperCase()} Quiz
       </h2>
+
+      <div className="timer">
+        ⏳ Time Left: {timeLeft}s
+      </div>
+
+      <ProgressBar
+        current={
+          currentQuestion + 1
+        }
+        total={questions.length}
+      />
 
       <Question
         question={
