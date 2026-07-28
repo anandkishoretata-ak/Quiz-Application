@@ -5,32 +5,32 @@ function QuizCard({ quiz }) {
   return (
     <motion.div
       className="quiz-card"
-      whileHover={{
-        scale: 1.05,
-      }}
-      transition={{
-        duration: 0.3,
-      }}
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.3 }}
     >
       <h2>{quiz.title}</h2>
 
       <p>
-        Category: {quiz.category}
+        <strong>Category:</strong> {quiz.category}
       </p>
 
       <p>
-        Questions: {quiz.questions}
+        <strong>Difficulty:</strong> {quiz.difficulty}
       </p>
 
       <p>
-        Duration: {quiz.time}
+        <strong>Questions:</strong> {quiz.questions}
       </p>
 
-     <Link to={`/quiz/${quiz.id}`}>
-      <button>
-    Start Quiz
-      </button>
-   </Link>
+      <p>
+        <strong>Duration:</strong> {quiz.time} sec
+      </p>
+
+      <Link to={`/quiz/${quiz.id}`}>
+        <button className="start-btn">
+          Start Quiz
+        </button>
+      </Link>
     </motion.div>
   );
 }
