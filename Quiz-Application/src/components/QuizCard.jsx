@@ -11,22 +11,28 @@ function QuizCard({ quiz }) {
       <h2>{quiz.title}</h2>
 
       <p>
-        <strong>Category:</strong> {quiz.category}
+        <strong>Category:</strong>{" "}
+        {quiz.category}
       </p>
 
       <p>
-        <strong>Difficulty:</strong> {quiz.difficulty}
+        <strong>Difficulty:</strong>{" "}
+        {quiz.difficulty}
       </p>
 
       <p>
-        <strong>Questions:</strong> {quiz.questions}
+        <strong>Questions:</strong>{" "}
+        {quiz.questions}
       </p>
 
       <p>
-        <strong>Duration:</strong> {quiz.time} sec
+        <strong>Duration:</strong>{" "}
+        {quiz.time} sec
       </p>
 
-      <Link to={`/quiz/${quiz.id}`}>
+      <Link
+        to={`/quiz/${quiz.category.toLowerCase()}`}
+      >
         <button className="start-btn">
           Start Quiz
         </button>
