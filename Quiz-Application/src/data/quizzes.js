@@ -1,38 +1,35 @@
 const quizzes = [
   {
-    id: "java",
-    title: "Java Quiz",
-    category: "Programming",
-    difficulty: "Easy",
+    id: 1,
+    title: "React Quiz",
+    category: "React",
+    difficulty: "Medium",
     questions: 10,
     time: 60,
   },
-
   {
-    id: "react",
-    title: "React Quiz",
-    category: "Frontend",
+    id: 2,
+    title: "Java Quiz",
+    category: "Java",
     difficulty: "Medium",
     questions: 10,
-    time: 90,
+    time: 60,
   },
-
   {
-    id: "mern",
+    id: 3,
     title: "MERN Quiz",
-    category: "Full Stack",
+    category: "MERN",
     difficulty: "Hard",
     questions: 10,
-    time: 120,
+    time: 60,
   },
-
   {
-    id: "aptitude",
+    id: 4,
     title: "Aptitude Quiz",
-    category: "Placement",
-    difficulty: "Medium",
+    category: "Aptitude",
+    difficulty: "Easy",
     questions: 10,
-    time: 90,
+    time: 60,
   },
 ];
 
