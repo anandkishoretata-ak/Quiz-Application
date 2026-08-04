@@ -7,37 +7,15 @@ import {
 import Question from "../components/Question";
 import ProgressBar from "../components/ProgressBar";
 
-import javaQuestions from "../data/javaQuestions";
-import reactQuestions from "../data/reactQuestions";
-import mernQuestions from "../data/mernQuestions";
-import aptitudeQuestions from "../data/aptitudeQuestions";
-
 function Quiz() {
   const navigate = useNavigate();
   const { category } = useParams();
 
-  let questions = [];
+  const [questions, setQuestions] =
+    useState([]);
 
-  switch (category) {
-    case "java":
-      questions = javaQuestions;
-      break;
-
-    case "react":
-      questions = reactQuestions;
-      break;
-
-    case "mern":
-      questions = mernQuestions;
-      break;
-
-    case "aptitude":
-      questions = aptitudeQuestions;
-      break;
-
-    default:
-      questions = [];
-  }
+  const [loading, setLoading] =
+    useState(true);
 
   const [currentQuestion, setCurrentQuestion] =
     useState(0);
@@ -48,14 +26,43 @@ function Quiz() {
   const [timeLeft, setTimeLeft] =
     useState(60);
 
-  const handleAnswer = (option) => {
-    setAnswers({
-      ...answers,
-      [currentQuestion]: option,
-    });
+  useEffect(() => {
+    fetchQuestions();
+  }, [category]);
+
+  const fetchQuestions = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `http://localhost:5000/api/questions?category=${category}`
+      );
+
+      const data =
+        await response.json();
+
+      setQuestions(data);
+      setCurrentQuestion(0);
+      setAnswers({});
+      setTimeLeft(60);
+    } catch (error) {
+      console.log(
+        "Error fetching questions:",
+        error
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const submitQuiz = () => {
+  const handleAnswer = (option) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQuestion]: option,
+    }));
+  };
+
+  const submitQuiz = async () => {
     let score = 0;
 
     questions.forEach(
@@ -79,24 +86,57 @@ function Quiz() {
       questions.length
     );
 
+    try {
+      const token =
+        localStorage.getItem(
+          "token"
+        );
+
+      await fetch(
+        "http://localhost:5000/api/scores/save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            category,
+            score,
+            totalQuestions:
+              questions.length,
+          }),
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+
     navigate("/result");
   };
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      submitQuiz();
+    if (
+      loading ||
+      questions.length === 0
+    )
       return;
-    }
 
     const timer = setInterval(() => {
-      setTimeLeft(
-        (prev) => prev - 1
-      );
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          submitQuiz();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     return () =>
       clearInterval(timer);
-  }, [timeLeft]);
+  }, [loading, questions]);
 
   const nextQuestion = () => {
     if (
@@ -104,7 +144,7 @@ function Quiz() {
       questions.length - 1
     ) {
       setCurrentQuestion(
-        currentQuestion + 1
+        (prev) => prev + 1
       );
     }
   };
@@ -112,17 +152,25 @@ function Quiz() {
   const previousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(
-        currentQuestion - 1
+        (prev) => prev - 1
       );
     }
   };
+
+  if (loading) {
+    return (
+      <h2>
+        Loading Questions...
+      </h2>
+    );
+  }
 
   if (questions.length === 0) {
     return (
       <div className="quiz-page">
         <h2>
-          No questions found for this
-          category.
+          No Questions Found For{" "}
+          {category}
         </h2>
       </div>
     );
@@ -152,12 +200,16 @@ function Quiz() {
         selectedAnswer={
           answers[currentQuestion]
         }
-        handleAnswer={handleAnswer}
+        handleAnswer={
+          handleAnswer
+        }
       />
 
       <div className="quiz-buttons">
         <button
-          onClick={previousQuestion}
+          onClick={
+            previousQuestion
+          }
           disabled={
             currentQuestion === 0
           }
