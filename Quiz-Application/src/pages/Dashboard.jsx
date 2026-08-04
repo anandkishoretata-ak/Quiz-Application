@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import Navbar from "../components/Navbar";
 import QuizCard from "../components/QuizCard";
-import quizzes from "../data/quizzes";
+import api from "../api/axios";
 
 function Dashboard() {
   const user = JSON.parse(
@@ -12,6 +12,61 @@ function Dashboard() {
 
   const [search, setSearch] =
     useState("");
+
+  const [quizzes, setQuizzes] =
+    useState([]);
+
+  const [totalQuestions, setTotalQuestions] =
+    useState(0);
+
+  useEffect(() => {
+    fetchQuizData();
+  }, []);
+
+  const fetchQuizData = async () => {
+    try {
+      const res = await api.get(
+        "/questions"
+      );
+
+      const questions =
+        res.data;
+
+      setTotalQuestions(
+        questions.length
+      );
+
+      const categories = [
+        ...new Set(
+          questions.map(
+            (q) => q.category
+          )
+        ),
+      ];
+
+      const quizData =
+        categories.map(
+          (category) => ({
+            id: category.toLowerCase(),
+            title: `${category} Quiz`,
+            category,
+            difficulty:
+              "Medium",
+            questions:
+              questions.filter(
+                (q) =>
+                  q.category ===
+                  category
+              ).length,
+            time: 60,
+          })
+        );
+
+      setQuizzes(quizData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const filteredQuizzes =
     quizzes.filter((quiz) =>
@@ -27,7 +82,6 @@ function Dashboard() {
       <Navbar />
 
       <div className="dashboard">
-        {/* Welcome Card */}
         <motion.div
           className="welcome-card"
           initial={{
@@ -44,7 +98,8 @@ function Dashboard() {
         >
           <h2>
             Welcome,{" "}
-            {user?.name || "Student"}
+            {user?.name ||
+              "Student"}
           </h2>
 
           <p>
@@ -53,16 +108,21 @@ function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Statistics Cards */}
         <div className="stats-container">
           <div className="stat-card">
-            <h2>4</h2>
+            <h2>
+              {quizzes.length}
+            </h2>
             <p>Total Quizzes</p>
           </div>
 
           <div className="stat-card">
-            <h2>70+</h2>
-            <p>Total Questions</p>
+            <h2>
+              {totalQuestions}
+            </h2>
+            <p>
+              Total Questions
+            </p>
           </div>
 
           <div className="stat-card">
@@ -71,7 +131,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Search Box */}
         <input
           className="search-box"
           type="text"
@@ -84,9 +143,10 @@ function Dashboard() {
           }
         />
 
-        <h1>Available Quizzes</h1>
+        <h1>
+          Available Quizzes
+        </h1>
 
-        {/* Quiz Cards */}
         <div className="quiz-container">
           {filteredQuizzes.map(
             (quiz) => (
