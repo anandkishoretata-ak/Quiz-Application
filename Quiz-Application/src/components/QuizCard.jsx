@@ -8,31 +8,31 @@ function QuizCard({ quiz }) {
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.3 }}
     >
+      <img
+        src={quiz.image}
+        alt={quiz.title}
+        className="quiz-image"
+      />
+
       <h2>{quiz.title}</h2>
 
       <p>
-        <strong>Category:</strong>{" "}
-        {quiz.category}
+        <strong>Category:</strong> {quiz.category}
       </p>
 
       <p>
-        <strong>Difficulty:</strong>{" "}
-        {quiz.difficulty}
+        <strong>Difficulty:</strong> {quiz.difficulty}
       </p>
 
       <p>
-        <strong>Questions:</strong>{" "}
-        {quiz.questions}
+        <strong>Questions:</strong> {quiz.questions}
       </p>
 
       <p>
-        <strong>Duration:</strong>{" "}
-        {quiz.time} sec
+        <strong>Duration:</strong> {quiz.time} sec
       </p>
 
-      <Link
-        to={`/quiz/${quiz.category.toLowerCase()}`}
-      >
+      <Link to={`/quiz/${quiz.id}`}>
         <button className="start-btn">
           Start Quiz
         </button>

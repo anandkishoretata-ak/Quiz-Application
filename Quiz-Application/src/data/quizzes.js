@@ -1,35 +1,44 @@
+import reactImg from "../assets/quizzes/react.png";
+import javaImg from "../assets/quizzes/nodejs.png";
+import mernImg from "../assets/quizzes/mern.png";
+import aptitudeImg from "../assets/quizzes/aptitude.png";
+
 const quizzes = [
   {
-    id: 1,
+    id: "react",
     title: "React Quiz",
     category: "React",
     difficulty: "Medium",
     questions: 10,
     time: 60,
+    image: reactImg,
   },
   {
-    id: 2,
+    id: "java",
     title: "Java Quiz",
     category: "Java",
     difficulty: "Medium",
     questions: 10,
     time: 60,
+    image: javaImg,
   },
   {
-    id: 3,
+    id: "mern",
     title: "MERN Quiz",
     category: "MERN",
-    difficulty: "Hard",
+    difficulty: "Medium",
     questions: 10,
     time: 60,
+    image: mernImg,
   },
   {
-    id: 4,
+    id: "aptitude",
     title: "Aptitude Quiz",
     category: "Aptitude",
-    difficulty: "Easy",
+    difficulty: "Medium",
     questions: 10,
     time: 60,
+    image: aptitudeImg,
   },
 ];
 

@@ -5,6 +5,11 @@ import Navbar from "../components/Navbar";
 import QuizCard from "../components/QuizCard";
 import api from "../api/axios";
 
+import reactImg from "../assets/quizzes/react.png";
+import javaImg from "../assets/quizzes/nodejs.png";
+import mernImg from "../assets/quizzes/mern.png";
+import aptitudeImg from "../assets/quizzes/aptitude.png";
+
 function Dashboard() {
   const user = JSON.parse(
     localStorage.getItem("user")
@@ -29,8 +34,7 @@ function Dashboard() {
         "/questions"
       );
 
-      const questions =
-        res.data;
+      const questions = res.data;
 
       setTotalQuestions(
         questions.length
@@ -46,20 +50,52 @@ function Dashboard() {
 
       const quizData =
         categories.map(
-          (category) => ({
-            id: category.toLowerCase(),
-            title: `${category} Quiz`,
-            category,
-            difficulty:
-              "Medium",
-            questions:
-              questions.filter(
-                (q) =>
-                  q.category ===
-                  category
-              ).length,
-            time: 60,
-          })
+          (category) => {
+            let image =
+              reactImg;
+
+            if (
+              category.toLowerCase() ===
+              "react"
+            ) {
+              image =
+                reactImg;
+            } else if (
+              category.toLowerCase() ===
+              "java"
+            ) {
+              image =
+                javaImg;
+            } else if (
+              category.toLowerCase() ===
+              "mern"
+            ) {
+              image =
+                mernImg;
+            } else if (
+              category.toLowerCase() ===
+              "aptitude"
+            ) {
+              image =
+                aptitudeImg;
+            }
+
+            return {
+              id: category.toLowerCase(),
+              title: `${category} Quiz`,
+              category,
+              difficulty:
+                "Medium",
+              questions:
+                questions.filter(
+                  (q) =>
+                    q.category ===
+                    category
+                ).length,
+              time: 60,
+              image,
+            };
+          }
         );
 
       setQuizzes(quizData);
