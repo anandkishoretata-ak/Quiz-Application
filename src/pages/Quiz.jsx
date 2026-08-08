@@ -26,179 +26,250 @@ function Quiz() {
   const [timeLeft, setTimeLeft] =
     useState(60);
 
+  const [submitted, setSubmitted] =
+    useState(false);
+
   useEffect(() => {
     fetchQuestions();
   }, [category]);
 
-  const fetchQuestions = async () => {
-    try {
-      setLoading(true);
+  const fetchQuestions =
+    async () => {
+      try {
+        setLoading(true);
 
-      const response = await fetch(
-        `http://localhost:5000/api/questions?category=${category}`
-      );
+        const response =
+          await fetch(
+            `http://localhost:5000/api/questions?category=${category}`
+          );
 
-      const data =
-        await response.json();
+        const data =
+          await response.json();
 
-      setQuestions(data);
-      setCurrentQuestion(0);
-      setAnswers({});
-      setTimeLeft(60);
-    } catch (error) {
-      console.log(
-        "Error fetching questions:",
-        error
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+        setQuestions(data);
+        setCurrentQuestion(0);
+        setAnswers({});
+        setTimeLeft(60);
 
-  const handleAnswer = (option) => {
+        localStorage.setItem(
+          "category",
+          category
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  const handleAnswer = (
+    option
+  ) => {
     setAnswers((prev) => ({
       ...prev,
-      [currentQuestion]: option,
+      [currentQuestion]:
+        option,
     }));
   };
 
-  const submitQuiz = async () => {
-    let score = 0;
+  const submitQuiz =
+    async () => {
+      if (submitted) return;
 
-    questions.forEach(
-      (question, index) => {
-        if (
-          answers[index] ===
-          question.answer
-        ) {
-          score++;
-        }
-      }
-    );
+      setSubmitted(true);
 
-    localStorage.setItem(
-      "score",
-      score
-    );
+      let score = 0;
 
-    localStorage.setItem(
-      "total",
-      questions.length
-    );
-
-    try {
-      const token =
-        localStorage.getItem(
-          "token"
-        );
-
-      await fetch(
-        "http://localhost:5000/api/scores/save",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            category,
-            score,
-            totalQuestions:
-              questions.length,
-          }),
+      questions.forEach(
+        (
+          question,
+          index
+        ) => {
+          if (
+            answers[index] ===
+            question.answer
+          ) {
+            score++;
+          }
         }
       );
-    } catch (error) {
-      console.log(error);
-    }
 
-    navigate("/result");
-  };
+      localStorage.setItem(
+        "score",
+        score
+      );
+
+      localStorage.setItem(
+        "total",
+        questions.length
+      );
+
+      localStorage.setItem(
+        "category",
+        category
+      );
+
+      try {
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        if (token) {
+          await fetch(
+            "http://localhost:5000/api/scores/save",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(
+                {
+                  category,
+                  score,
+                  totalQuestions:
+                    questions.length,
+                }
+              ),
+            }
+          );
+        }
+      } catch (error) {
+        console.log(
+          "Save Error:",
+          error
+        );
+      }
+
+      navigate("/result");
+    };
 
   useEffect(() => {
     if (
       loading ||
-      questions.length === 0
+      questions.length ===
+        0 ||
+      submitted
     )
       return;
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          submitQuiz();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const timer =
+      setInterval(() => {
+        setTimeLeft(
+          (prev) => {
+            if (
+              prev <= 1
+            ) {
+              clearInterval(
+                timer
+              );
+              submitQuiz();
+              return 0;
+            }
+
+            return (
+              prev - 1
+            );
+          }
+        );
+      }, 1000);
 
     return () =>
       clearInterval(timer);
-  }, [loading, questions]);
+  }, [
+    loading,
+    questions,
+    submitted,
+  ]);
 
-  const nextQuestion = () => {
-    if (
-      currentQuestion <
-      questions.length - 1
-    ) {
-      setCurrentQuestion(
-        (prev) => prev + 1
-      );
-    }
-  };
+  const nextQuestion =
+    () => {
+      if (
+        currentQuestion <
+        questions.length - 1
+      ) {
+        setCurrentQuestion(
+          (prev) =>
+            prev + 1
+        );
+      }
+    };
 
-  const previousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(
-        (prev) => prev - 1
-      );
-    }
-  };
+  const previousQuestion =
+    () => {
+      if (
+        currentQuestion > 0
+      ) {
+        setCurrentQuestion(
+          (prev) =>
+            prev - 1
+        );
+      }
+    };
 
   if (loading) {
     return (
       <h2>
-        Loading Questions...
+        Loading
+        Questions...
       </h2>
     );
   }
 
-  if (questions.length === 0) {
+  if (
+    questions.length === 0
+  ) {
     return (
-      <div className="quiz-page">
-        <h2>
-          No Questions Found For{" "}
-          {category}
-        </h2>
-      </div>
+      <h2>
+        No Questions
+        Found For{" "}
+        {category}
+      </h2>
     );
   }
 
   return (
     <div className="quiz-page">
-      <h2>
-        {category.toUpperCase()} Quiz
-      </h2>
+      <h1>
+        {category.toUpperCase()}{" "}
+        Quiz
+      </h1>
 
       <div className="timer">
-        ⏳ Time Left: {timeLeft}s
+        ⏳ Time Left:{" "}
+        {timeLeft}s
       </div>
+
+      <h3>
+        Question{" "}
+        {currentQuestion +
+          1}{" "}
+        of{" "}
+        {questions.length}
+      </h3>
 
       <ProgressBar
         current={
-          currentQuestion + 1
+          currentQuestion +
+          1
         }
-        total={questions.length}
+        total={
+          questions.length
+        }
       />
 
       <Question
         question={
-          questions[currentQuestion]
+          questions[
+            currentQuestion
+          ]
         }
         selectedAnswer={
-          answers[currentQuestion]
+          answers[
+            currentQuestion
+          ]
         }
         handleAnswer={
           handleAnswer
@@ -211,22 +282,28 @@ function Quiz() {
             previousQuestion
           }
           disabled={
-            currentQuestion === 0
+            currentQuestion ===
+            0
           }
         >
           Previous
         </button>
 
         {currentQuestion ===
-        questions.length - 1 ? (
+        questions.length -
+          1 ? (
           <button
-            onClick={submitQuiz}
+            onClick={
+              submitQuiz
+            }
           >
             Submit Quiz
           </button>
         ) : (
           <button
-            onClick={nextQuestion}
+            onClick={
+              nextQuestion
+            }
           >
             Next
           </button>

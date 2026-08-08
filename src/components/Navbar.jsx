@@ -19,16 +19,24 @@ function Navbar() {
       "isLoggedIn"
     );
 
+    localStorage.removeItem(
+      "user"
+    );
+
     window.location.href =
       "/login";
   };
 
   return (
     <nav className="navbar">
-      <h2>Quiz Master</h2>
+      <h2 className="logo">
+        Quiz Master
+      </h2>
 
       <div className="nav-links">
-        <Link to="/">Home</Link>
+        <Link to="/">
+          Home
+        </Link>
 
         <Link to="/dashboard">
           Dashboard
@@ -42,11 +50,12 @@ function Navbar() {
           Profile
         </Link>
 
-        <span>
-          {user?.name}
+        <span className="username">
+          👤 {user?.name || "Student"}
         </span>
 
         <button
+          className="theme-btn"
           onClick={() =>
             setTheme(
               theme === "dark"
@@ -61,6 +70,7 @@ function Navbar() {
         </button>
 
         <button
+          className="logout-btn"
           onClick={handleLogout}
         >
           Logout

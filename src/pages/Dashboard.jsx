@@ -15,6 +15,9 @@ function Dashboard() {
     localStorage.getItem("user")
   );
 
+  const token =
+    localStorage.getItem("token");
+
   const [search, setSearch] =
     useState("");
 
@@ -24,10 +27,21 @@ function Dashboard() {
   const [totalQuestions, setTotalQuestions] =
     useState(0);
 
+  const [attempted, setAttempted] =
+    useState(0);
+
+  const [highestScore, setHighestScore] =
+    useState(0);
+
+  const [loading, setLoading] =
+    useState(true);
+
   useEffect(() => {
     fetchQuizData();
+    fetchUserStats();
   }, []);
 
+  // Fetch Questions
   const fetchQuizData = async () => {
     try {
       const res = await api.get(
@@ -51,37 +65,35 @@ function Dashboard() {
       const quizData =
         categories.map(
           (category) => {
-            let image =
-              reactImg;
+            let image = reactImg;
 
-            if (
-              category.toLowerCase() ===
-              "react"
+            switch (
+              category.toLowerCase()
             ) {
-              image =
-                reactImg;
-            } else if (
-              category.toLowerCase() ===
-              "java"
-            ) {
-              image =
-                javaImg;
-            } else if (
-              category.toLowerCase() ===
-              "mern"
-            ) {
-              image =
-                mernImg;
-            } else if (
-              category.toLowerCase() ===
-              "aptitude"
-            ) {
-              image =
-                aptitudeImg;
+              case "react":
+                image = reactImg;
+                break;
+
+              case "java":
+                image = javaImg;
+                break;
+
+              case "mern":
+                image = mernImg;
+                break;
+
+              case "aptitude":
+                image =
+                  aptitudeImg;
+                break;
+
+              default:
+                image = reactImg;
             }
 
             return {
-              id: category.toLowerCase(),
+              id:
+                category.toLowerCase(),
               title: `${category} Quiz`,
               category,
               difficulty:
@@ -104,6 +116,52 @@ function Dashboard() {
     }
   };
 
+  // Fetch User Stats
+  const fetchUserStats =
+    async () => {
+      try {
+        const res =
+          await fetch(
+            "http://localhost:5000/api/scores/my-scores",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+        const data =
+          await res.json();
+
+        if (
+          res.ok &&
+          Array.isArray(data)
+        ) {
+          setAttempted(
+            data.length
+          );
+
+          const maxScore =
+            data.length > 0
+              ? Math.max(
+                  ...data.map(
+                    (s) =>
+                      s.score
+                  )
+                )
+              : 0;
+
+          setHighestScore(
+            maxScore
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
   const filteredQuizzes =
     quizzes.filter((quiz) =>
       quiz.title
@@ -118,6 +176,7 @@ function Dashboard() {
       <Navbar />
 
       <div className="dashboard">
+
         <motion.div
           className="welcome-card"
           initial={{
@@ -128,12 +187,10 @@ function Dashboard() {
             opacity: 1,
             y: 0,
           }}
-          transition={{
-            duration: 0.5,
-          }}
         >
           <h2>
-            Welcome,{" "}
+            Welcome,
+            {" "}
             {user?.name ||
               "Student"}
           </h2>
@@ -144,12 +201,17 @@ function Dashboard() {
           </p>
         </motion.div>
 
+        {/* Stats */}
+
         <div className="stats-container">
+
           <div className="stat-card">
             <h2>
               {quizzes.length}
             </h2>
-            <p>Total Quizzes</p>
+            <p>
+              Total Quizzes
+            </p>
           </div>
 
           <div className="stat-card">
@@ -162,9 +224,23 @@ function Dashboard() {
           </div>
 
           <div className="stat-card">
-            <h2>100%</h2>
-            <p>Learning</p>
+            <h2>
+              {attempted}
+            </h2>
+            <p>
+              Attempted
+            </p>
           </div>
+
+          <div className="stat-card">
+            <h2>
+              {highestScore}
+            </h2>
+            <p>
+              Highest Score
+            </p>
+          </div>
+
         </div>
 
         <input
@@ -183,16 +259,22 @@ function Dashboard() {
           Available Quizzes
         </h1>
 
-        <div className="quiz-container">
-          {filteredQuizzes.map(
-            (quiz) => (
-              <QuizCard
-                key={quiz.id}
-                quiz={quiz}
-              />
-            )
-          )}
-        </div>
+        {loading ? (
+          <h2>
+            Loading...
+          </h2>
+        ) : (
+          <div className="quiz-container">
+            {filteredQuizzes.map(
+              (quiz) => (
+                <QuizCard
+                  key={quiz.id}
+                  quiz={quiz}
+                />
+              )
+            )}
+          </div>
+        )}
       </div>
     </>
   );
