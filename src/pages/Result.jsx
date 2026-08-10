@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+
 import generatePdf from "../utils/generatePdf";
 
 import {
@@ -14,64 +15,134 @@ import {
 function Result() {
   const navigate = useNavigate();
 
-  const score = Number(
-    localStorage.getItem("score")
-  );
+  // -----------------------------
+  // GET DATA
+  // -----------------------------
+
+  const score =
+    Number(
+      localStorage.getItem("score")
+    ) || 0;
 
   const total =
     Number(
       localStorage.getItem("total")
     ) || 0;
 
-  const percentage = (
-    (score / total) *
-    100
-  ).toFixed(0);
+  const category =
+    localStorage.getItem(
+      "category"
+    );
 
   const user = JSON.parse(
     localStorage.getItem("user")
   );
 
-  const category =
-    localStorage.getItem(
-      "category"
-    ) || "General";
+  // -----------------------------
+  // SAFE CATEGORY
+  // -----------------------------
+
+  const quizCategory =
+    category || "Unknown";
+
+  // -----------------------------
+  // SAFE PERCENTAGE
+  // -----------------------------
+
+  const percentage =
+    total > 0
+      ? (
+          (score / total) *
+          100
+        ).toFixed(0)
+      : 0;
+
+  // -----------------------------
+  // CHART DATA
+  // -----------------------------
 
   const chartData = [
     {
-      name: "Score",
-      Value: score,
+      name: "Correct",
+      value: score,
     },
     {
       name: "Total",
-      Value: total,
+      value: total,
     },
   ];
 
+  // -----------------------------
+  // SAVE RESULT
+  // -----------------------------
+
   useEffect(() => {
+
+    // Do not save invalid results
+    if (
+      total <= 0 ||
+      !category
+    ) {
+      console.log(
+        "Invalid quiz result. Nothing saved."
+      );
+
+      return;
+    }
+
     saveScore();
     saveHistory();
+
   }, []);
 
+  // -----------------------------
+  // SAVE SCORE TO MONGODB
+  // -----------------------------
+
   const saveScore = async () => {
+
     try {
+
       const token =
         localStorage.getItem(
           "token"
         );
 
-      if (!token) return;
+      if (!token) {
+        console.log(
+          "No token found."
+        );
+        return;
+      }
+
+      if (total <= 0) {
+        console.log(
+          "Invalid total questions."
+        );
+        return;
+      }
+
+      if (!category) {
+        console.log(
+          "Invalid category."
+        );
+        return;
+      }
 
       const response =
         await fetch(
           "http://localhost:5000/api/scores/save",
           {
             method: "POST",
+
             headers: {
               "Content-Type":
                 "application/json",
-              Authorization: `Bearer ${token}`,
+
+              Authorization:
+                `Bearer ${token}`,
             },
+
             body: JSON.stringify({
               category,
               score,
@@ -88,15 +159,30 @@ function Result() {
         "Score Saved:",
         data
       );
+
     } catch (error) {
+
       console.log(
         "Score Save Error:",
         error
       );
+
     }
   };
 
+  // -----------------------------
+  // SAVE LOCAL HISTORY
+  // -----------------------------
+
   const saveHistory = () => {
+
+    if (
+      total <= 0 ||
+      !category
+    ) {
+      return;
+    }
+
     const history =
       JSON.parse(
         localStorage.getItem(
@@ -108,49 +194,88 @@ function Result() {
       name:
         user?.name ||
         "Guest",
+
       category,
+
       score,
+
       total,
+
       percentage,
+
       date:
         new Date().toLocaleDateString(),
     };
 
-    const alreadyExists =
-      history.some(
-        (item) =>
-          item.score ===
-            score &&
-          item.category ===
-            category &&
-          item.date ===
-            resultData.date
-      );
+    history.push(
+      resultData
+    );
 
-    if (!alreadyExists) {
-      history.push(
-        resultData
-      );
-
-      localStorage.setItem(
-        "quizHistory",
-        JSON.stringify(
-          history
-        )
-      );
-    }
+    localStorage.setItem(
+      "quizHistory",
+      JSON.stringify(
+        history
+      )
+    );
   };
+
+  // -----------------------------
+  // DASHBOARD
+  // -----------------------------
+
+  const goToDashboard = () => {
+    navigate(
+      "/dashboard"
+    );
+  };
+
+  // -----------------------------
+  // LEADERBOARD
+  // -----------------------------
+
+  const goToLeaderboard = () => {
+    navigate(
+      "/leaderboard"
+    );
+  };
+
+  // -----------------------------
+  // PDF
+  // -----------------------------
+
+  const downloadPdf = () => {
+
+    if (total <= 0) {
+      alert(
+        "Invalid quiz result."
+      );
+      return;
+    }
+
+    generatePdf(
+      user,
+      quizCategory,
+      score,
+      total
+    );
+  };
+
+  // -----------------------------
+  // RESULT PAGE
+  // -----------------------------
 
   return (
     <div className="result-page">
+
       <div className="result-card">
+
         <h1>
           🎉 Quiz Completed
         </h1>
 
         <h2>
-          Score: {score} /{" "}
-          {total}
+          Score:{" "}
+          {score} / {total}
         </h2>
 
         <h3>
@@ -160,7 +285,7 @@ function Result() {
 
         <h3>
           Category:{" "}
-          {category}
+          {quizCategory}
         </h3>
 
         <h3>
@@ -169,7 +294,10 @@ function Result() {
             : "Failed ❌"}
         </h3>
 
-        {/* Performance Chart */}
+        {/* -------------------------
+             PERFORMANCE CHART
+        -------------------------- */}
+
         <div
           style={{
             width: "100%",
@@ -177,28 +305,30 @@ function Result() {
             marginTop: "30px",
           }}
         >
+
           <h3>
-            📊 Performance
-            Chart
+            📊 Performance Chart
           </h3>
 
           <ResponsiveContainer
             width="100%"
-            height="100%"
+            height="85%"
           >
+
             <BarChart
-              data={
-                chartData
-              }
+              data={chartData}
             >
-              <XAxis dataKey="name" />
+
+              <XAxis
+                dataKey="name"
+              />
 
               <YAxis />
 
               <Tooltip />
 
               <Bar
-                dataKey="Value"
+                dataKey="value"
                 radius={[
                   8,
                   8,
@@ -206,59 +336,56 @@ function Result() {
                   0,
                 ]}
               />
+
             </BarChart>
+
           </ResponsiveContainer>
+
         </div>
 
-        {/* Buttons */}
+        {/* -------------------------
+             BUTTONS
+        -------------------------- */}
+
         <div
           style={{
-            marginTop:
-              "30px",
+            marginTop: "30px",
+            display: "flex",
+            justifyContent:
+              "center",
+            gap: "10px",
+            flexWrap: "wrap",
           }}
         >
+
           <button
-            onClick={() =>
-              navigate(
-                "/dashboard"
-              )
+            onClick={
+              goToDashboard
             }
           >
-            Dashboard
+            🏠 Dashboard
           </button>
 
           <button
-            onClick={() =>
-              navigate(
-                "/leaderboard"
-              )
+            onClick={
+              goToLeaderboard
             }
-            style={{
-              marginLeft:
-                "10px",
-            }}
           >
-            Leaderboard
+            🏆 Leaderboard
           </button>
 
           <button
-            onClick={() =>
-              generatePdf(
-                user,
-                category,
-                score,
-                total
-              )
+            onClick={
+              downloadPdf
             }
-            style={{
-              marginLeft:
-                "10px",
-            }}
           >
-            Download PDF
+            📄 Download PDF
           </button>
+
         </div>
+
       </div>
+
     </div>
   );
 }
