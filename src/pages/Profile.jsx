@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 
 function Profile() {
   const user = JSON.parse(
-    localStorage.getItem("user")
+    localStorage.getItem("user") || "{}"
   );
 
   const [scores, setScores] = useState([]);
@@ -15,7 +15,8 @@ function Profile() {
 
   const fetchScores = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token");
 
       if (!token) {
         setScores([]);
@@ -33,16 +34,35 @@ function Profile() {
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
-      console.log("PROFILE API RESPONSE:", data);
+      console.log(
+        "PROFILE API RESPONSE:",
+        data
+      );
 
-      if (response.ok && Array.isArray(data)) {
-        // Remove invalid 0/0 records
-        const validScores = data.filter(
-          (item) =>
-            Number(item.totalQuestions) > 0
-        );
+      if (
+        response.ok &&
+        Array.isArray(data)
+      ) {
+        const validScores =
+          data
+            .filter(
+              (item) =>
+                Number(
+                  item.totalQuestions
+                ) > 0
+            )
+            .sort(
+              (a, b) =>
+                new Date(
+                  b.createdAt
+                ) -
+                new Date(
+                  a.createdAt
+                )
+            );
 
         setScores(validScores);
       } else {
@@ -60,51 +80,38 @@ function Profile() {
     }
   };
 
-  // -----------------------------
-  // BEST SCORE
-  // -----------------------------
+  // Best Score (%)
 
   const highestScore =
     scores.length > 0
       ? Math.max(
           ...scores.map(
             (item) =>
-              Number(item.score) || 0
+              ((Number(item.score) /
+                Number(
+                  item.totalQuestions
+                )) *
+                100) ||
+              0
           )
-        )
+        ).toFixed(0)
       : 0;
 
-  // -----------------------------
-  // PERCENTAGES
-  // -----------------------------
-
-  const percentages = scores
-    .filter(
-      (item) =>
-        Number(item.totalQuestions) > 0
-    )
-    .map((item) => {
-      const score =
-        Number(item.score) || 0;
-
-      const total =
-        Number(item.totalQuestions);
-
-      return (score / total) * 100;
-    });
-
-  // -----------------------------
-  // AVERAGE SCORE
-  // -----------------------------
+  // Average Score (%)
 
   const averageScore =
-    percentages.length > 0
+    scores.length > 0
       ? (
-          percentages.reduce(
-            (sum, value) =>
-              sum + value,
+          scores.reduce(
+            (sum, item) =>
+              sum +
+              (Number(item.score) /
+                Number(
+                  item.totalQuestions
+                )) *
+                100,
             0
-          ) / percentages.length
+          ) / scores.length
         ).toFixed(0)
       : 0;
 
@@ -113,30 +120,24 @@ function Profile() {
       <Navbar />
 
       <div className="profile-page">
-
-        {/* PAGE TITLE */}
-
         <h1>
           👤 My Profile
         </h1>
 
-        {/* PROFILE CARD */}
+        {/* Profile Card */}
 
         <div className="profile-card">
-
           <h2>
-            {user?.name || "Student"}
+            {user?.name ||
+              "Student"}
           </h2>
 
           <p>
-            {user?.email || "No Email"}
+            {user?.email ||
+              "No Email"}
           </p>
 
-          {/* PROFILE STATS */}
-
           <div className="profile-stats">
-
-            {/* QUIZZES ATTEMPTED */}
 
             <div className="profile-stat">
               <h3>
@@ -148,19 +149,15 @@ function Profile() {
               </p>
             </div>
 
-            {/* BEST SCORE */}
-
             <div className="profile-stat">
               <h3>
-                {highestScore}
+                {highestScore}%
               </h3>
 
               <p>
                 Best Score
               </p>
             </div>
-
-            {/* AVERAGE SCORE */}
 
             <div className="profile-stat">
               <h3>
@@ -175,19 +172,19 @@ function Profile() {
           </div>
         </div>
 
-        {/* QUIZ HISTORY */}
+        {/* Quiz History */}
 
         <h2 className="history-title">
           Quiz History
         </h2>
 
         {loading ? (
+          <h3>Loading...</h3>
+        ) : scores.length ===
+          0 ? (
           <h3>
-            Loading...
-          </h3>
-        ) : scores.length === 0 ? (
-          <h3>
-            No Quiz History Found
+            No Quiz History
+            Found
           </h3>
         ) : (
           <table className="history-table">
@@ -202,56 +199,63 @@ function Profile() {
             </thead>
 
             <tbody>
+              {scores.map(
+                (score) => {
+                  const scoreValue =
+                    Number(
+                      score.score
+                    ) || 0;
 
-              {scores.map((score) => {
+                  const totalQuestions =
+                    Number(
+                      score.totalQuestions
+                    );
 
-                const scoreValue =
-                  Number(score.score) || 0;
+                  const percentage =
+                    (
+                      (scoreValue /
+                        totalQuestions) *
+                      100
+                    ).toFixed(0);
 
-                const totalQuestions =
-                  Number(
-                    score.totalQuestions
+                  return (
+                    <tr
+                      key={
+                        score._id
+                      }
+                    >
+                      <td>
+                        {
+                          score.category
+                        }
+                      </td>
+
+                      <td>
+                        {
+                          scoreValue
+                        }
+                        /
+                        {
+                          totalQuestions
+                        }
+                      </td>
+
+                      <td>
+                        {
+                          percentage
+                        }
+                        %
+                      </td>
+
+                      <td>
+                        {new Date(
+                          score.createdAt
+                        ).toLocaleDateString()}
+                      </td>
+                    </tr>
                   );
-
-                const percentage =
-                  totalQuestions > 0
-                    ? (
-                        (scoreValue /
-                          totalQuestions) *
-                        100
-                      ).toFixed(0)
-                    : 0;
-
-                return (
-                  <tr
-                    key={score._id}
-                  >
-
-                    <td>
-                      {score.category}
-                    </td>
-
-                    <td>
-                      {scoreValue}/
-                      {totalQuestions}
-                    </td>
-
-                    <td>
-                      {percentage}%
-                    </td>
-
-                    <td>
-                      {score.createdAt
-                        ? new Date(
-                            score.createdAt
-                          ).toLocaleDateString()
-                        : "-"}
-                    </td>
-
-                  </tr>
-                );
-              })}
-
+                }
+              )}
             </tbody>
 
           </table>
