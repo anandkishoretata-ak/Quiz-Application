@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 import generatePdf from "../utils/generatePdf";
+import generateCertificate from "../utils/generateCertificate";
 
 import {
   BarChart,
@@ -15,9 +16,9 @@ import {
 function Result() {
   const navigate = useNavigate();
 
-  // -----------------------------
+  // =============================
   // GET DATA
-  // -----------------------------
+  // =============================
 
   const score =
     Number(
@@ -32,22 +33,12 @@ function Result() {
   const category =
     localStorage.getItem(
       "category"
-    );
+    ) || "Unknown";
 
   const user = JSON.parse(
-    localStorage.getItem("user")
+    localStorage.getItem("user") ||
+      "{}"
   );
-
-  // -----------------------------
-  // SAFE CATEGORY
-  // -----------------------------
-
-  const quizCategory =
-    category || "Unknown";
-
-  // -----------------------------
-  // SAFE PERCENTAGE
-  // -----------------------------
 
   const percentage =
     total > 0
@@ -57,9 +48,9 @@ function Result() {
         ).toFixed(0)
       : 0;
 
-  // -----------------------------
+  // =============================
   // CHART DATA
-  // -----------------------------
+  // =============================
 
   const chartData = [
     {
@@ -67,67 +58,39 @@ function Result() {
       value: score,
     },
     {
-      name: "Total",
-      value: total,
+      name: "Wrong",
+      value: total - score,
     },
   ];
 
-  // -----------------------------
-  // SAVE RESULT
-  // -----------------------------
+  // =============================
+  // SAVE DATA
+  // =============================
 
   useEffect(() => {
-
-    // Do not save invalid results
     if (
       total <= 0 ||
-      !category
+      category === "Unknown"
     ) {
-      console.log(
-        "Invalid quiz result. Nothing saved."
-      );
-
       return;
     }
 
     saveScore();
     saveHistory();
-
   }, []);
 
-  // -----------------------------
-  // SAVE SCORE TO MONGODB
-  // -----------------------------
+  // =============================
+  // SAVE SCORE TO DATABASE
+  // =============================
 
   const saveScore = async () => {
-
     try {
-
       const token =
         localStorage.getItem(
           "token"
         );
 
-      if (!token) {
-        console.log(
-          "No token found."
-        );
-        return;
-      }
-
-      if (total <= 0) {
-        console.log(
-          "Invalid total questions."
-        );
-        return;
-      }
-
-      if (!category) {
-        console.log(
-          "Invalid category."
-        );
-        return;
-      }
+      if (!token) return;
 
       const response =
         await fetch(
@@ -139,8 +102,7 @@ function Result() {
               "Content-Type":
                 "application/json",
 
-              Authorization:
-                `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
 
             body: JSON.stringify({
@@ -159,30 +121,19 @@ function Result() {
         "Score Saved:",
         data
       );
-
     } catch (error) {
-
       console.log(
         "Score Save Error:",
         error
       );
-
     }
   };
 
-  // -----------------------------
+  // =============================
   // SAVE LOCAL HISTORY
-  // -----------------------------
+  // =============================
 
   const saveHistory = () => {
-
-    if (
-      total <= 0 ||
-      !category
-    ) {
-      return;
-    }
-
     const history =
       JSON.parse(
         localStorage.getItem(
@@ -192,8 +143,7 @@ function Result() {
 
     const resultData = {
       name:
-        user?.name ||
-        "Guest",
+        user?.name || "Guest",
 
       category,
 
@@ -207,85 +157,88 @@ function Result() {
         new Date().toLocaleDateString(),
     };
 
-    history.push(
-      resultData
-    );
+    const alreadyExists =
+      history.some(
+        (item) =>
+          item.category ===
+            category &&
+          item.score ===
+            score &&
+          item.date ===
+            resultData.date
+      );
 
-    localStorage.setItem(
-      "quizHistory",
-      JSON.stringify(
-        history
-      )
-    );
+    if (!alreadyExists) {
+      history.push(resultData);
+
+      localStorage.setItem(
+        "quizHistory",
+        JSON.stringify(history)
+      );
+    }
   };
 
-  // -----------------------------
-  // DASHBOARD
-  // -----------------------------
+  // =============================
+  // BUTTON FUNCTIONS
+  // =============================
 
   const goToDashboard = () => {
-    navigate(
-      "/dashboard"
-    );
+    navigate("/dashboard");
   };
 
-  // -----------------------------
-  // LEADERBOARD
-  // -----------------------------
-
-  const goToLeaderboard = () => {
-    navigate(
-      "/leaderboard"
-    );
-  };
-
-  // -----------------------------
-  // PDF
-  // -----------------------------
+  const goToLeaderboard =
+    () => {
+      navigate(
+        "/leaderboard"
+      );
+    };
 
   const downloadPdf = () => {
-
-    if (total <= 0) {
-      alert(
-        "Invalid quiz result."
-      );
-      return;
-    }
-
     generatePdf(
       user,
-      quizCategory,
+      category,
       score,
       total
     );
   };
 
-  // -----------------------------
-  // RESULT PAGE
-  // -----------------------------
+  const downloadCertificate =
+    () => {
+      generateCertificate(
+        user,
+        category,
+        score,
+        total
+      );
+    };
+
+  // =============================
+  // UI
+  // =============================
 
   return (
     <div className="result-page">
-
       <div className="result-card">
 
         <h1>
           🎉 Quiz Completed
+          Successfully
         </h1>
 
         <h2>
-          Score:{" "}
-          {score} / {total}
+          Score: {score} / {total}
         </h2>
 
         <h3>
-          Percentage:{" "}
+          Percentage:
+          {" "}
           {percentage}%
         </h3>
 
         <h3>
-          Category:{" "}
-          {quizCategory}
+          Category:
+          {" "}
+          {category}
         </h3>
 
         <h3>
@@ -294,9 +247,23 @@ function Result() {
             : "Failed ❌"}
         </h3>
 
-        {/* -------------------------
-             PERFORMANCE CHART
-        -------------------------- */}
+        {/* Motivation */}
+
+        <p
+          style={{
+            marginTop: "10px",
+            fontWeight: "600",
+            fontSize: "18px",
+          }}
+        >
+          {percentage >= 80
+            ? "🌟 Excellent Performance!"
+            : percentage >= 50
+            ? "👍 Good Job!"
+            : "📚 Keep Practicing!"}
+        </p>
+
+        {/* Performance Chart */}
 
         <div
           style={{
@@ -305,23 +272,19 @@ function Result() {
             marginTop: "30px",
           }}
         >
-
           <h3>
-            📊 Performance Chart
+            📊 Performance
+            Chart
           </h3>
 
           <ResponsiveContainer
             width="100%"
             height="85%"
           >
-
             <BarChart
               data={chartData}
             >
-
-              <XAxis
-                dataKey="name"
-              />
+              <XAxis dataKey="name" />
 
               <YAxis />
 
@@ -336,16 +299,11 @@ function Result() {
                   0,
                 ]}
               />
-
             </BarChart>
-
           </ResponsiveContainer>
-
         </div>
 
-        {/* -------------------------
-             BUTTONS
-        -------------------------- */}
+        {/* Buttons */}
 
         <div
           style={{
@@ -357,7 +315,6 @@ function Result() {
             flexWrap: "wrap",
           }}
         >
-
           <button
             onClick={
               goToDashboard
@@ -382,10 +339,16 @@ function Result() {
             📄 Download PDF
           </button>
 
+          <button
+            onClick={
+              downloadCertificate
+            }
+          >
+            🏅 Certificate
+          </button>
         </div>
 
       </div>
-
     </div>
   );
 }
