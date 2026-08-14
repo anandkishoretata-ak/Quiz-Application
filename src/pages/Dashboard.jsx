@@ -33,6 +33,12 @@ function Dashboard() {
   const [highestScore, setHighestScore] =
     useState(0);
 
+  const [averageScore, setAverageScore] =
+    useState(0);
+
+  const [latestQuiz, setLatestQuiz] =
+    useState("None");
+
   const [loading, setLoading] =
     useState(true);
 
@@ -41,14 +47,19 @@ function Dashboard() {
     fetchUserStats();
   }, []);
 
-  // Fetch Questions
+  // =====================
+  // FETCH QUIZZES
+  // =====================
+
   const fetchQuizData = async () => {
     try {
-      const res = await api.get(
-        "/questions"
-      );
+      const res =
+        await api.get(
+          "/questions"
+        );
 
-      const questions = res.data;
+      const questions =
+        res.data;
 
       setTotalQuestions(
         questions.length
@@ -57,7 +68,8 @@ function Dashboard() {
       const categories = [
         ...new Set(
           questions.map(
-            (q) => q.category
+            (q) =>
+              q.category
           )
         ),
       ];
@@ -65,21 +77,25 @@ function Dashboard() {
       const quizData =
         categories.map(
           (category) => {
-            let image = reactImg;
+            let image =
+              reactImg;
 
             switch (
               category.toLowerCase()
             ) {
               case "react":
-                image = reactImg;
+                image =
+                  reactImg;
                 break;
 
               case "java":
-                image = javaImg;
+                image =
+                  javaImg;
                 break;
 
               case "mern":
-                image = mernImg;
+                image =
+                  mernImg;
                 break;
 
               case "aptitude":
@@ -88,7 +104,8 @@ function Dashboard() {
                 break;
 
               default:
-                image = reactImg;
+                image =
+                  reactImg;
             }
 
             return {
@@ -110,13 +127,18 @@ function Dashboard() {
           }
         );
 
-      setQuizzes(quizData);
+      setQuizzes(
+        quizData
+      );
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Fetch User Stats
+  // =====================
+  // FETCH USER STATS
+  // =====================
+
   const fetchUserStats =
     async () => {
       try {
@@ -146,7 +168,9 @@ function Dashboard() {
               ? Math.max(
                   ...data.map(
                     (s) =>
-                      s.score
+                      Number(
+                        s.score
+                      ) || 0
                   )
                 )
               : 0;
@@ -154,6 +178,51 @@ function Dashboard() {
           setHighestScore(
             maxScore
           );
+
+          const percentages =
+            data.map(
+              (item) =>
+                item.totalQuestions >
+                0
+                  ? (
+                      item.score /
+                      item.totalQuestions
+                    ) *
+                    100
+                  : 0
+            );
+
+          const avg =
+            percentages.length >
+            0
+              ? (
+                  percentages.reduce(
+                    (
+                      sum,
+                      value
+                    ) =>
+                      sum +
+                      value,
+                    0
+                  ) /
+                  percentages.length
+                ).toFixed(0)
+              : 0;
+
+          setAverageScore(
+            avg
+          );
+
+          const latest =
+            data[
+              data.length - 1
+            ];
+
+          if (latest) {
+            setLatestQuiz(
+              latest.category
+            );
+          }
         }
       } catch (error) {
         console.log(error);
@@ -162,13 +231,18 @@ function Dashboard() {
       }
     };
 
+  // =====================
+  // SEARCH FILTER
+  // =====================
+
   const filteredQuizzes =
-    quizzes.filter((quiz) =>
-      quiz.title
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        )
+    quizzes.filter(
+      (quiz) =>
+        quiz.title
+          .toLowerCase()
+          .includes(
+            search.toLowerCase()
+          )
     );
 
   return (
@@ -187,27 +261,31 @@ function Dashboard() {
             opacity: 1,
             y: 0,
           }}
+          transition={{
+            duration: 0.5,
+          }}
         >
           <h2>
-            Welcome,
-            {" "}
+            Welcome,{" "}
             {user?.name ||
               "Student"}
           </h2>
 
           <p>
-            Ready to test your
-            skills?
+            Ready to test
+            your skills?
           </p>
         </motion.div>
 
-        {/* Stats */}
+        {/* Statistics */}
 
         <div className="stats-container">
 
           <div className="stat-card">
             <h2>
-              {quizzes.length}
+              {
+                quizzes.length
+              }
             </h2>
             <p>
               Total Quizzes
@@ -216,10 +294,12 @@ function Dashboard() {
 
           <div className="stat-card">
             <h2>
-              {totalQuestions}
+              {
+                totalQuestions
+              }
             </h2>
             <p>
-              Total Questions
+              Questions
             </p>
           </div>
 
@@ -228,20 +308,47 @@ function Dashboard() {
               {attempted}
             </h2>
             <p>
-              Attempted
+              Attempts
             </p>
           </div>
 
           <div className="stat-card">
             <h2>
-              {highestScore}
+              {
+                highestScore
+              }
             </h2>
             <p>
-              Highest Score
+              Best Score
+            </p>
+          </div>
+
+          <div className="stat-card">
+            <h2>
+              {
+                averageScore
+              }
+              %
+            </h2>
+            <p>
+              Average
+            </p>
+          </div>
+
+          <div className="stat-card">
+            <h2>
+              {
+                latestQuiz
+              }
+            </h2>
+            <p>
+              Latest Quiz
             </p>
           </div>
 
         </div>
+
+        {/* Search */}
 
         <input
           className="search-box"
@@ -266,15 +373,22 @@ function Dashboard() {
         ) : (
           <div className="quiz-container">
             {filteredQuizzes.map(
-              (quiz) => (
+              (
+                quiz
+              ) => (
                 <QuizCard
-                  key={quiz.id}
-                  quiz={quiz}
+                  key={
+                    quiz.id
+                  }
+                  quiz={
+                    quiz
+                  }
                 />
               )
             )}
           </div>
         )}
+
       </div>
     </>
   );
