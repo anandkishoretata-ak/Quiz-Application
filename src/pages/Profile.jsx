@@ -37,32 +37,26 @@ function Profile() {
       const data =
         await response.json();
 
-      console.log(
-        "PROFILE API RESPONSE:",
-        data
-      );
-
       if (
         response.ok &&
         Array.isArray(data)
       ) {
-        const validScores =
-          data
-            .filter(
-              (item) =>
-                Number(
-                  item.totalQuestions
-                ) > 0
-            )
-            .sort(
-              (a, b) =>
-                new Date(
-                  b.createdAt
-                ) -
-                new Date(
-                  a.createdAt
-                )
-            );
+        const validScores = data
+          .filter(
+            (item) =>
+              Number(
+                item.totalQuestions
+              ) > 0
+          )
+          .sort(
+            (a, b) =>
+              new Date(
+                b.createdAt
+              ) -
+              new Date(
+                a.createdAt
+              )
+          );
 
         setScores(validScores);
       } else {
@@ -80,24 +74,27 @@ function Profile() {
     }
   };
 
-  // Best Score (%)
+  // -----------------------------
+  // BEST SCORE %
+  // -----------------------------
 
   const highestScore =
     scores.length > 0
       ? Math.max(
           ...scores.map(
             (item) =>
-              ((Number(item.score) /
+              (Number(item.score) /
                 Number(
                   item.totalQuestions
                 )) *
-                100) ||
-              0
+              100
           )
         ).toFixed(0)
       : 0;
 
-  // Average Score (%)
+  // -----------------------------
+  // AVERAGE SCORE %
+  // -----------------------------
 
   const averageScore =
     scores.length > 0
@@ -115,11 +112,74 @@ function Profile() {
         ).toFixed(0)
       : 0;
 
+  // -----------------------------
+  // PASSED QUIZZES
+  // -----------------------------
+
+  const passedQuizzes =
+    scores.filter(
+      (item) =>
+        (Number(item.score) /
+          Number(
+            item.totalQuestions
+          )) *
+          100 >=
+        50
+    ).length;
+
+  // -----------------------------
+  // FAILED QUIZZES
+  // -----------------------------
+
+  const failedQuizzes =
+    scores.length -
+    passedQuizzes;
+
+  // -----------------------------
+  // LAST ATTEMPT
+  // -----------------------------
+
+  const lastAttempt =
+    scores.length > 0
+      ? new Date(
+          scores[0].createdAt
+        ).toLocaleDateString()
+      : "N/A";
+
+  // -----------------------------
+  // RECENT CATEGORY
+  // -----------------------------
+
+  const recentCategory =
+    scores.length > 0
+      ? scores[0].category
+      : "N/A";
+
+  // -----------------------------
+  // PERFORMANCE LEVEL
+  // -----------------------------
+
+  let performanceLevel =
+    "Beginner";
+
+  if (
+    Number(averageScore) >= 80
+  ) {
+    performanceLevel =
+      "Expert";
+  } else if (
+    Number(averageScore) >= 60
+  ) {
+    performanceLevel =
+      "Intermediate";
+  }
+
   return (
     <>
       <Navbar />
 
       <div className="profile-page">
+
         <h1>
           👤 My Profile
         </h1>
@@ -127,6 +187,7 @@ function Profile() {
         {/* Profile Card */}
 
         <div className="profile-card">
+
           <h2>
             {user?.name ||
               "Student"}
@@ -143,7 +204,6 @@ function Profile() {
               <h3>
                 {scores.length}
               </h3>
-
               <p>
                 Quizzes Attempted
               </p>
@@ -153,7 +213,6 @@ function Profile() {
               <h3>
                 {highestScore}%
               </h3>
-
               <p>
                 Best Score
               </p>
@@ -163,13 +222,64 @@ function Profile() {
               <h3>
                 {averageScore}%
               </h3>
-
               <p>
                 Average Score
               </p>
             </div>
 
+            <div className="profile-stat">
+              <h3>
+                {performanceLevel}
+              </h3>
+              <p>
+                Level
+              </p>
+            </div>
+
           </div>
+
+        </div>
+
+        {/* Statistics */}
+
+        <div className="profile-card">
+
+          <h2>
+            📊 Statistics
+          </h2>
+
+          <p>
+            ✅ Passed Quizzes:
+            <strong>
+              {" "}
+              {passedQuizzes}
+            </strong>
+          </p>
+
+          <p>
+            ❌ Failed Quizzes:
+            <strong>
+              {" "}
+              {failedQuizzes}
+            </strong>
+          </p>
+
+          <p>
+            📚 Recent Category:
+            <strong>
+              {" "}
+              {recentCategory}
+            </strong>
+          </p>
+
+          <p>
+            🕒 Last Attempt:
+            <strong>
+              {" "}
+              {lastAttempt}
+            </strong>
+          </p>
+
         </div>
 
         {/* Quiz History */}
@@ -180,11 +290,9 @@ function Profile() {
 
         {loading ? (
           <h3>Loading...</h3>
-        ) : scores.length ===
-          0 ? (
+        ) : scores.length === 0 ? (
           <h3>
-            No Quiz History
-            Found
+            No Quiz History Found
           </h3>
         ) : (
           <table className="history-table">
@@ -201,20 +309,14 @@ function Profile() {
             <tbody>
               {scores.map(
                 (score) => {
-                  const scoreValue =
-                    Number(
-                      score.score
-                    ) || 0;
-
-                  const totalQuestions =
-                    Number(
-                      score.totalQuestions
-                    );
-
                   const percentage =
                     (
-                      (scoreValue /
-                        totalQuestions) *
+                      (Number(
+                        score.score
+                      ) /
+                        Number(
+                          score.totalQuestions
+                        )) *
                       100
                     ).toFixed(0);
 
@@ -232,19 +334,16 @@ function Profile() {
 
                       <td>
                         {
-                          scoreValue
+                          score.score
                         }
                         /
                         {
-                          totalQuestions
+                          score.totalQuestions
                         }
                       </td>
 
                       <td>
-                        {
-                          percentage
-                        }
-                        %
+                        {percentage}%
                       </td>
 
                       <td>
