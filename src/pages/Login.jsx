@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import {
+  useNavigate,
+  Link,
+} from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [showPassword, setShowPassword] =
+    useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +30,8 @@ function Login() {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
           body: JSON.stringify({
             email,
@@ -28,10 +40,14 @@ function Login() {
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
-        alert(data.message);
+        alert(
+          data.message ||
+            "Login Failed"
+        );
         return;
       }
 
@@ -50,10 +66,17 @@ function Login() {
         "true"
       );
 
+      alert(
+        "Login Successful ✅"
+      );
+
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-      alert("Server Error");
+
+      alert(
+        "Server Error. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -61,48 +84,87 @@ function Login() {
 
   return (
     <div className="auth-container">
+
       <form
         className="auth-form"
         onSubmit={handleSubmit}
       >
-        <h1>Login</h1>
+        <h1>
+          Welcome Back 👋
+        </h1>
+
+        <p>
+          Login to continue
+          your quizzes
+        </p>
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Enter Email"
           value={email}
           onChange={(e) =>
-            setEmail(e.target.value)
+            setEmail(
+              e.target.value
+            )
           }
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          required
-        />
+        <div className="password-box">
+          <input
+            type={
+              showPassword
+                ? "text"
+                : "password"
+            }
+            placeholder="Enter Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+            required
+          />
+
+          <button
+            type="button"
+            className="show-btn"
+            onClick={() =>
+              setShowPassword(
+                !showPassword
+              )
+            }
+          >
+            {showPassword
+              ? "🙈"
+              : "👁️"}
+          </button>
+        </div>
 
         <button
           type="submit"
           disabled={loading}
         >
           {loading
-            ? "Logging in..."
+            ? "Logging In..."
             : "Login"}
         </button>
 
-        <p style={{ marginTop: "15px" }}>
-          Don't have an account?{" "}
+        <p
+          style={{
+            marginTop:
+              "15px",
+          }}
+        >
+          Don't have an
+          account?{" "}
           <Link to="/register">
             Register
           </Link>
         </p>
       </form>
+
     </div>
   );
 }
