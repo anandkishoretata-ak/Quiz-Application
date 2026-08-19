@@ -1,23 +1,13 @@
 import { useState } from "react";
-import {
-  useNavigate,
-  Link,
-} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,8 +20,7 @@ function Login() {
         {
           method: "POST",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             email,
@@ -40,43 +29,22 @@ function Login() {
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        alert(
-          data.message ||
-            "Login Failed"
-        );
+        alert(data.message || "Login Failed");
         return;
       }
 
-      localStorage.setItem(
-        "token",
-        data.token
-      );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("isLoggedIn", "true");
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
-
-      localStorage.setItem(
-        "isLoggedIn",
-        "true"
-      );
-
-      alert(
-        "Login Successful ✅"
-      );
-
+      alert("Login Successful ✅");
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-
-      alert(
-        "Server Error. Please try again."
-      );
+      alert("Server Error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -84,87 +52,47 @@ function Login() {
 
   return (
     <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h1>Welcome Back 👋</h1>
 
-      <form
-        className="auth-form"
-        onSubmit={handleSubmit}
-      >
-        <h1>
-          Welcome Back 👋
-        </h1>
-
-        <p>
-          Login to continue
-          your quizzes
-        </p>
+        <p>Login to continue your quizzes</p>
 
         <input
           type="email"
           placeholder="Enter Email"
           value={email}
-          onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
-          }
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
 
-        <div className="password-box">
+        <div className="password-container">
           <input
-            type={
-              showPassword
-                ? "text"
-                : "password"
-            }
+            className="password-input"
+            type={showPassword ? "text" : "password"}
             placeholder="Enter Password"
             value={password}
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 
           <button
             type="button"
-            className="show-btn"
-            onClick={() =>
-              setShowPassword(
-                !showPassword
-              )
-            }
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword
-              ? "🙈"
-              : "👁️"}
+            {showPassword ? "🙈" : "👁️"}
           </button>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-        >
-          {loading
-            ? "Logging In..."
-            : "Login"}
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging In..." : "Login"}
         </button>
 
-        <p
-          style={{
-            marginTop:
-              "15px",
-          }}
-        >
-          Don't have an
-          account?{" "}
-          <Link to="/register">
-            Register
-          </Link>
+        <p className="auth-link">
+          Don't have an account?{" "}
+          <Link to="/register">Register</Link>
         </p>
       </form>
-
     </div>
   );
 }
