@@ -40,11 +40,11 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message);
+        alert(data.message || "Registration Failed");
         return;
       }
 
-      alert("Registration Successful");
+      alert("Registration Successful ✅");
       navigate("/login");
     } catch (error) {
       console.log(error);
@@ -62,7 +62,7 @@ function Register() {
         <input
           type="text"
           name="name"
-          placeholder="Name"
+          placeholder="Enter Name"
           value={formData.name}
           onChange={handleChange}
           required
@@ -71,7 +71,7 @@ function Register() {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Enter Email"
           value={formData.email}
           onChange={handleChange}
           required
@@ -79,9 +79,10 @@ function Register() {
 
         <div className="password-container">
           <input
+            className="password-input"
             type={showPassword ? "text" : "password"}
             name="password"
-            placeholder="Password"
+            placeholder="Enter Password"
             value={formData.password}
             onChange={handleChange}
             required
@@ -89,10 +90,10 @@ function Register() {
 
           <button
             type="button"
-            className="show-password-btn"
+            className="toggle-password"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? "🙈" : "👁"}
+            {showPassword ? "🙈" : "👁️"}
           </button>
         </div>
 
